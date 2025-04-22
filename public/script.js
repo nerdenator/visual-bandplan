@@ -9,7 +9,7 @@ form.addEventListener('submit', (event) => {
   event.preventDefault();
 
   // Get the values from the form
-  const apiKey = apiKeyInput.value;
+  // const apiKey = apiKeyInput.value;
   const location = locationInput.value;
   const radius = radiusInput.value;
   const band = bandSelect.value;
