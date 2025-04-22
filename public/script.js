@@ -1,6 +1,6 @@
 const form = document.getElementById('input-form');
-const apiKeyInput = document.getElementsByName('api-key')[0];
-const locationInput = document.getElementsByName('location')[0];
+const latitudeInput = document.getElementsByName('latitude')[0];
+const longitudeInput = document.getElementsByName('longitude')[0];
 const radiusInput = document.getElementsByName('radius')[0];
 const bandSelect = document.getElementById('band-select');
 const svg = d3.select('#bandplan-svg');
@@ -19,7 +19,6 @@ form.addEventListener('submit', (event) => {
   const url = `${baseUrl}&lat=${location}&miles=${radius}`;
   console.log(url);
   // Call the API
-  javascript
   fetch(url, {
     headers: {
       'User-Agent': 'visual-bandplan(kj7yjm@icloud.com)'
@@ -92,4 +91,4 @@ function drawBandPlan(svg, data) {
         .attr('stroke', 'black');
     }
   });
-}
+}})
