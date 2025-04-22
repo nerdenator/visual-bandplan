@@ -1,7 +1,8 @@
 const form = document.getElementById('input-form');
-const latitudeInput = document.getElementsByName('latitude')[0];
-const longitudeInput = document.getElementsByName('longitude')[0];
-const radiusInput = document.getElementsByName('radius')[0];
+// const latitudeInput = document.getElementsByName('latitude')[0];
+// const longitudeInput = document.getElementsByName('longitude')[0];
+const cityInput = document.getElementsByName('city')[0];
+// const radiusInput = document.getElementsByName('radius')[0];
 const bandSelect = document.getElementById('band-select');
 const svg = d3.select('#bandplan-svg');
 
@@ -11,9 +12,10 @@ form.addEventListener('submit', (event) => {
   // Get the values from the form
   // const apiKey = apiKeyInput.value;
   // const location = locationInput.value;
-  const latitude = latitudeInput.value;
-  const longitude = longitudeInput.value;
-  const radius = radiusInput.value;
+  // const latitude = latitudeInput.value;
+  // const longitude = longitudeInput.value;
+  const city = cityInput.value;
+  // const radius = radiusInput.value;
   const band = bandSelect.value;
 
   // Construct the API URL
@@ -34,8 +36,9 @@ form.addEventListener('submit', (event) => {
 function drawBandPlan(svg, data) {
   // Band definitions
   const bands = {
-    VHF: { minFrequency: 144, maxFrequency: 148 },
-    UHF: { minFrequency: 420, maxFrequency: 450 },
+    "2m": { minFrequency: 144, maxFrequency: 148 },
+    "70cm": { minFrequency: 420, maxFrequency: 450 },
+    "6m": { minFrequency: 50, maxFreqency: 54 },
     "10m": { minFrequency: 28, maxFrequency: 29.7 },
   };
   
