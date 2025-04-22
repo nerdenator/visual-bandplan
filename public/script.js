@@ -10,13 +10,15 @@ form.addEventListener('submit', (event) => {
 
   // Get the values from the form
   // const apiKey = apiKeyInput.value;
-  const location = locationInput.value;
+  // const location = locationInput.value;
+  const latitude = latitudeInput.value;
+  const longitude = longitudeInput.value;
   const radius = radiusInput.value;
   const band = bandSelect.value;
 
   // Construct the API URL
   const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
-  const url = `${baseUrl}&lat=${location}&miles=${radius}`;
+  const url = `${baseUrl}&lat=${latitude}&long=${longitude}&miles=${radius}`;
   console.log(url);
   // Call the API
   fetch(url, {
