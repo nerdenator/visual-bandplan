@@ -21,6 +21,7 @@ form.addEventListener('submit', (event) => {
   })
     .then(response => response.json())
     .then(data => {
+      console.log("Data received:", data);
       drawBandPlan(svg, data);
     });
 
@@ -61,23 +62,25 @@ form.addEventListener('submit', (event) => {
     // Iterate over the results
     console.log("Drawing band plan for band:", selectedBand);
     results.forEach(result => {
+      console.log("Processing result:", result);
       // Get the output frequency
-      const output_frequency = parseFloat(result.output_frequency);
-
+      const output_frequency = parseFloat(result.Frequency);
+      console.log("Output frequency:", output_frequency);
       // Check if the repeater is in the selected band
       if (output_frequency >= minFrequency && output_frequency <= maxFrequency) {
+        console.log(`Drawing repeater at frequency: ${output_frequency} MHz`);
         // Calculate the x position
         const x = ((output_frequency - minFrequency) / frequencyRange) * svgWidth;
 
         // Get the input frequency
-        const input_frequency = parseFloat(result.input_frequency);
+        const input_frequency = parseFloat(result["Input Freq"]);
 
         // Calculate the repeater frequency range
         const repeaterFrequencyRange = Math.abs(output_frequency - input_frequency);
 
         // Calculate the width
         const width = (repeaterFrequencyRange / frequencyRange) * svgWidth;
-
+        debugger
         // Draw a rectangle
         svg.append('rect')
           .attr('x', x)
