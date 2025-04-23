@@ -1,8 +1,5 @@
 const form = document.getElementById('input-form');
-// const latitudeInput = document.getElementsByName('latitude')[0];
-// const longitudeInput = document.getElementsByName('longitude')[0];
 const cityInput = document.getElementsByName('city')[0];
-// const radiusInput = document.getElementsByName('radius')[0];
 const bandSelect = document.getElementById('band-select');
 const svg = d3.select('#bandplan-svg');
 
@@ -20,7 +17,7 @@ form.addEventListener('submit', (event) => {
 
   // Construct the API URL
   const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
-  const url = `${baseUrl}&lat=${latitude}&long=${longitude}&miles=${radius}`;
+  const url = `${baseUrl}&city=${city}&band=${band}`;
   console.log(url);
   // Call the API
   fetch(url, {
@@ -28,18 +25,18 @@ form.addEventListener('submit', (event) => {
       'User-Agent': 'visual-bandplan(kj7yjm@icloud.com)'
     }
   })
-  .then(response => response.json())
-  .then(data => {
-    drawBandPlan(svg, data);
-  });
+    .then(response => response.json())
+    .then(data => {
+      drawBandPlan(svg, data);
+    });
 
   function drawBandPlan(svg, data) {
     // Band definitions
     const bands = {
       "2m": { minFrequency: 144, maxFrequency: 148 },
       "70cm": { minFrequency: 420, maxFrequency: 450 },
-      "6m": { minFrequency: 50, maxFreqency: 54 },
-      "10m": { minFrequency: 28, maxFrequency: 29.7 },
+      "6m": { minFrequency: 50, maxFrequency: 54 },
+      "10m": { minFrequency: 28, maxFrequency: 29.7 }
     };
 
     // Get selected band
