@@ -1,0 +1,24 @@
+{
+  "status": "success",
+  "result": [
+    {
+      "platform": "gcfv2",
+      "id": "api",
+      "project": "visual-bandplan",
+      "region": "us-central1",
+      "httpsTrigger": {},
+      "entryPoint": "api",
+      "runtime": "nodejs22",
+      "source": {
+        "storageSource": {
+          "bucket": "gcf-v2-sources-593519362501-us-central1",
+          "object": "api/function-source.zip",
+          "generation": "1745545394211483"
+        }
+      },
+      "uri": "https://us-central1-visual-bandplan.cloudfunctions.net/api",
+      "codebase": "default",
+      "hash": "c798e9d245942b184821701f9a131b91c0846cdb"
+    }
+  ]
+}

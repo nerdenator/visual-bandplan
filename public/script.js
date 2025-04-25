@@ -24,8 +24,9 @@ form.addEventListener('submit', (event) => {
   const city = encodeURIComponent(cityInput.value);
 
   // Rest of your existing code...
-  const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
-  const url = `${baseUrl}&city=${city}`;
+  // const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
+  // const url = `${baseUrl}&city=${city}`;
+  const url = `/api/repeaters?city=${city}`;
   console.log(url);
   // Call the API
   fetch(url, {
@@ -36,7 +37,35 @@ form.addEventListener('submit', (event) => {
     .then(response => response.json())
     .then(data => {
       console.log("Data received:", data);
-      drawBandPlan(svg, data);
+      // Band definitions
+      const bands = {
+        "2m": { minFrequency: 144, maxFrequency: 148 },
+        "70cm": { minFrequency: 420, maxFrequency: 450 },
+        "6m": { minFrequency: 50, maxFrequency: 54 },
+        "10m": { minFrequency: 28, maxFrequency: 29.7 }
+      };
+
+      // Get selected band
+      const selectedBand = bandSelect.value;
+      const band = bands[selectedBand];
+
+      // If no band is selected, return
+      if (!band) {
+        console.log("No band selected");
+        return;
+      }
+
+      // Filter results to only include frequencies within the selected band
+      const filteredResults = data.results.filter(result => {
+        const frequency = parseFloat(result.Frequency);
+        return frequency >= band.minFrequency && frequency <= band.maxFrequency;
+      });
+
+      // Update data object with filtered results
+      const filteredData = { ...data, results: filteredResults };
+
+      // Draw the band plan with filtered data
+      drawBandPlan(svg, filteredData);
       
       // Get the repeater details container
       const detailsList = document.getElementById('repeater-details');
@@ -44,7 +73,7 @@ form.addEventListener('submit', (event) => {
       detailsList.innerHTML = '';
       
       // Add each repeater's details
-      data.results.forEach(repeater => {
+      filteredResults.forEach(repeater => {
         const listItem = document.createElement('div');
         listItem.className = 'repeater-item';
         listItem.innerHTML = `
@@ -115,6 +144,7 @@ form.addEventListener('submit', (event) => {
 
     // Iterate over the results
     console.log("Drawing band plan for band:", selectedBand);
+
     results.forEach(result => {
       console.log("Processing result:", result);
       // Get the output frequency
