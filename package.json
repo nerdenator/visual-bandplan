@@ -1,0 +1,22 @@
+{
+  "name": "visual-bandplan",
+  "version": "0.0.1",
+  "description": "A project that uses AJAX calls and D3.js to display the available chunks of amateur radio bands in your area.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nerdenator/visual-bandplan.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/nerdenator/visual-bandplan/issues"
+  },
+  "homepage": "https://github.com/nerdenator/visual-bandplan#readme",
+  "dependencies": {
+    "eslint": "^9.25.1"
+  }
+}

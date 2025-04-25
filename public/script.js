@@ -3,13 +3,27 @@ const cityInput = document.getElementsByName('city')[0];
 const bandSelect = document.getElementById('band-select');
 const svg = d3.select('#bandplan-svg');
 
+let lastSubmitTime = 0;
+const COOLDOWN_PERIOD = 10000; // 10 seconds in milliseconds
+
 form.addEventListener('submit', (event) => {
   event.preventDefault();
+
+  // Check if enough time has passed since last submit
+  const currentTime = Date.now();
+  if (currentTime - lastSubmitTime < COOLDOWN_PERIOD) {
+    const remainingTime = Math.ceil((COOLDOWN_PERIOD - (currentTime - lastSubmitTime)) / 1000);
+    alert(`Please wait ${remainingTime} seconds before submitting again`);
+    return;
+  }
+
+  // Update last submit time
+  lastSubmitTime = currentTime;
 
   // Get the values from the form
   const city = encodeURIComponent(cityInput.value);
 
-  // Construct the API URL
+  // Rest of your existing code...
   const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
   const url = `${baseUrl}&city=${city}`;
   console.log(url);
@@ -23,6 +37,24 @@ form.addEventListener('submit', (event) => {
     .then(data => {
       console.log("Data received:", data);
       drawBandPlan(svg, data);
+      
+      // Get the repeater details container
+      const detailsList = document.getElementById('repeater-details');
+      // Clear existing content
+      detailsList.innerHTML = '';
+      
+      // Add each repeater's details
+      data.results.forEach(repeater => {
+        const listItem = document.createElement('div');
+        listItem.className = 'repeater-item';
+        listItem.innerHTML = `
+          <h3>${repeater.Frequency} MHz</h3>
+          <p>Call Sign: ${repeater.Callsign}</p>
+          <p>Input Freq: ${repeater['Input Freq']} MHz</p>
+          <p>Location: ${repeater.Location}</p>
+        `;
+        detailsList.appendChild(listItem);
+      });
     });
 
   function drawBandPlan(svg, data) {
@@ -53,8 +85,30 @@ form.addEventListener('submit', (event) => {
     const minFrequency = band.minFrequency;
     const maxFrequency = band.maxFrequency;
 
+    // Filter results to only include frequencies within the selected band
+    const filteredResults = results.filter(result => {
+      const frequency = parseFloat(result.Frequency);
+      return frequency >= minFrequency && frequency <= maxFrequency;
+    });
+
+    if (filteredResults.length === 0) {
+      console.log("No repeaters found in selected band");
+      return;
+    }
+
     // Get the width of the svg
     const svgWidth = svg.node().getBoundingClientRect().width;
+    // Clear any existing content in the SVG
+    svg.selectAll("*").remove();
+
+    // Add a background rectangle spanning the full width
+    svg.append('rect')
+      .attr('x', 0)
+      .attr('y', 50)
+      .attr('width', svgWidth)
+      .attr('height', 20)
+      .attr('fill', '#f0f0f0')
+      .attr('stroke', '#cccccc');
 
     // Calculate the frequency range
     const frequencyRange = maxFrequency - minFrequency;
@@ -82,13 +136,47 @@ form.addEventListener('submit', (event) => {
         const width = (repeaterFrequencyRange / frequencyRange) * svgWidth;
         debugger
         // Draw a rectangle
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+        // Draw the repeater rectangle
         svg.append('rect')
           .attr('x', x)
           .attr('y', 50)
           .attr('width', width)
           .attr('height', 20)
-          .attr('fill', 'blue')
+          .attr('fill', colors[Math.floor(Math.random() * colors.length)])
           .attr('stroke', 'black');
+          // Add frequency labels with band-specific steps
+          let step;
+          switch (selectedBand) {
+            case '2m':
+            case '6m':
+              step = 0.5; // 500 kHz
+              break;
+            case '10m':
+              step = 0.05; // 50 kHz
+              break;
+            default:
+              step = 5; // 5 MHz (for 70cm/UHF)
+          }
+
+        for (let freq = Math.ceil(minFrequency/step)*step; freq <= maxFrequency; freq += step) {
+          const labelX = ((freq - minFrequency) / frequencyRange) * svgWidth;
+          svg.append('text')
+            .attr('x', labelX)
+            .attr('y', 90)
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '12px')
+            .text(freq);
+
+          // Add small tick marks
+          svg.append('line')
+            .attr('x1', labelX)
+            .attr('y1', 70)
+            .attr('x2', labelX)
+            .attr('y2', 75)
+            .attr('stroke', 'black')
+            .attr('stroke-width', 1);
+        }
       }
     });
   }
