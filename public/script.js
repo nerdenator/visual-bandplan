@@ -22,69 +22,81 @@ form.addEventListener('submit', (event) => {
 
   // Get the values from the form
   const city = encodeURIComponent(cityInput.value);
+  const url = `https://us-central1-visual-bandplan.cloudfunctions.net/api/repeaters?city=${city}`;
+  console.log('Requesting:', url);
 
-  // Rest of your existing code...
-  // const baseUrl = 'https://www.repeaterbook.com/api/export.php?&format=json';
-  // const url = `${baseUrl}&city=${city}`;
-  const url = `/api/repeaters?city=${city}`;
-  console.log(url);
-  // Call the API
   fetch(url, {
+    method: 'GET',
     headers: {
+      'Content-Type': 'application/json',
       'User-Agent': 'visual-bandplan(kj7yjm@icloud.com)'
-    }
+    },
+    mode: 'cors'
   })
-    .then(response => response.json())
-    .then(data => {
-      console.log("Data received:", data);
-      // Band definitions
-      const bands = {
-        "2m": { minFrequency: 144, maxFrequency: 148 },
-        "70cm": { minFrequency: 420, maxFrequency: 450 },
-        "6m": { minFrequency: 50, maxFrequency: 54 },
-        "10m": { minFrequency: 28, maxFrequency: 29.7 }
-      };
+  .then(response => {
+    if (!response.ok) {
+      console.error('Response not OK:', response.status, response.statusText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (!data || !data.results) {
+      throw new Error('Invalid data format received');
+    }
+    console.log("Data received:", data);
+    // Band definitions
+    const bands = {
+      "2m": { minFrequency: 144, maxFrequency: 148 },
+      "70cm": { minFrequency: 420, maxFrequency: 450 },
+      "6m": { minFrequency: 50, maxFrequency: 54 },
+      "10m": { minFrequency: 28, maxFrequency: 29.7 }
+    };
 
-      // Get selected band
-      const selectedBand = bandSelect.value;
-      const band = bands[selectedBand];
+    // Get selected band
+    const selectedBand = bandSelect.value;
+    const band = bands[selectedBand];
 
-      // If no band is selected, return
-      if (!band) {
-        console.log("No band selected");
-        return;
-      }
+    // If no band is selected, return
+    if (!band) {
+      console.log("No band selected");
+      return;
+    }
 
-      // Filter results to only include frequencies within the selected band
-      const filteredResults = data.results.filter(result => {
-        const frequency = parseFloat(result.Frequency);
-        return frequency >= band.minFrequency && frequency <= band.maxFrequency;
-      });
-
-      // Update data object with filtered results
-      const filteredData = { ...data, results: filteredResults };
-
-      // Draw the band plan with filtered data
-      drawBandPlan(svg, filteredData);
-      
-      // Get the repeater details container
-      const detailsList = document.getElementById('repeater-details');
-      // Clear existing content
-      detailsList.innerHTML = '';
-      
-      // Add each repeater's details
-      filteredResults.forEach(repeater => {
-        const listItem = document.createElement('div');
-        listItem.className = 'repeater-item';
-        listItem.innerHTML = `
-          <h3>${repeater.Frequency} MHz</h3>
-          <p>Call Sign: ${repeater.Callsign}</p>
-          <p>Input Freq: ${repeater['Input Freq']} MHz</p>
-          <p>Location: ${repeater.Location}</p>
-        `;
-        detailsList.appendChild(listItem);
-      });
+    // Filter results to only include frequencies within the selected band
+    const filteredResults = data.results.filter(result => {
+      const frequency = parseFloat(result.Frequency);
+      return frequency >= band.minFrequency && frequency <= band.maxFrequency;
     });
+
+    // Update data object with filtered results
+    const filteredData = { ...data, results: filteredResults };
+
+    // Draw the band plan with filtered data
+    drawBandPlan(svg, filteredData);
+    
+    // Get the repeater details container
+    const detailsList = document.getElementById('repeater-details');
+    // Clear existing content
+    detailsList.innerHTML = '';
+    
+    // Add each repeater's details
+    filteredResults.forEach(repeater => {
+      const listItem = document.createElement('div');
+      listItem.className = 'repeater-item';
+      listItem.innerHTML = `
+        <h3>${repeater.Frequency} MHz</h3>
+        <p>Call Sign: ${repeater.Callsign}</p>
+        <p>Input Freq: ${repeater['Input Freq']} MHz</p>
+        <p>Location: ${repeater.Location}</p>
+      `;
+      detailsList.appendChild(listItem);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+    alert('Error fetching repeater data. Please try again later.');
+  });
 
   function drawBandPlan(svg, data) {
     // Band definitions
