@@ -6,14 +6,22 @@
       {
         "source": "/api/**",
         "function": {
-          "functionId": "api",
-          "region": "us-central1"
+          "serviceId": "api",
+          "region": "us-central1",
+          "pinTag": true
         }
       }
     ]
   },
   "functions": {
     "source": "functions",
-    "runtime": "nodejs22"
+    "runtime": "nodejs22",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ]
   }
 }
